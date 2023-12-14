@@ -1,0 +1,168 @@
+from tkinter import *
+from tkinter import filedialog
+from PIL import Image, ImageTk
+import time
+import cv2
+
+
+# Функция распознавания движения
+
+def motion_detection(file_path, area):
+    # Функция для скриншотов
+    def screenshot(screen_frame):
+        # Уникальный идентификатор для скриншота берется из метки времени
+        # с точностью до наносекунд
+        scren_name = f'./screens/{str(time.time()).replace(".", "")}.jpg'
+        # запись скриншота в файл
+        cv2.imwrite(scren_name, screen_frame)
+
+    # флаг, срабатывающий в самый первый момент тревоги
+    is_first_detection_screen = False
+    # Флаг, срабатывающий, если обнаружен объект
+    is_detected = False
+    # Кадр, на котором основывается распознавание объектов
+    background = None
+    # Чтение видеопотока из файла
+    video = cv2.VideoCapture(file_path)
+    # Запуск видеопотока
+    while True:
+        print('qwe')
+        # Считывание кадра из видеопотока и есть ли он вообще
+        status, _frame = video.read()
+        frame = _frame
+        # Если кадр существует
+        if status:
+            # Если распознавание идет в заданной области
+            if area:
+                # Обрезаем кадр по этой области
+                frame = frame[int(area[1]):int(area[1] + area[3]), int(area[0]):int(area[0] + area[2])]
+            # Преобразуем кадр из blue, green, red в оттенки серого
+            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            # Сглаживаем неравномерные значения пикселей с помощью Гауссова размытия
+            gray_frame = cv2.GaussianBlur(gray_frame, (25, 25), 0)
+
+            # Заносим первый кадр, в кадр, на котором основывается обнаружения объектов
+            if background is None:
+                background = gray_frame
+
+            # Нахождение разницы между двумя кадрами
+            diff = cv2.absdiff(background, gray_frame)
+            # Присваиваем пикселям значение, относительно порогового значения
+            # ПОРОГОВОЕ ЗНАЧЕНИЕ ПОДБИРАЛОСЬ ЭКСПЕРИМЕНТАЛЬНЫМ ПУТЕМ
+            thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)[1]
+            # Расширяем выделенную область на предыдущем этапе
+            thresh = cv2.dilate(thresh, None, iterations=2)
+            # Выделяем контуры на нашем кадре
+            contours, res = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            # Проходимся по всем найденным контурам
+            for contour in contours:
+                # Находим площадь контура
+                # Сравниваем площадь контура с некой константой,
+                # во избежание срабатывания на слишком маленькие объекты
+                # Данную константу я задал, как 5% площади кадра
+                if cv2.contourArea(contour) > frame.shape[0] * frame.shape[1] / 20:
+                    # Накладываем текст, если движения обнаружено
+                    cv2.putText(_frame, 'Тревога', (50, 50),
+                                cv2.FONT_HERSHEY_COMPLEX, 1,
+                                (0, 0, 255), 1, cv2.LINE_4)
+                    is_detected = True
+
+            # Делаем скриншот
+            if is_detected and not is_first_detection_screen:
+                screenshot(frame)
+                is_first_detection_screen = True
+            elif not is_detected:
+                is_first_detection_screen = False
+
+            is_detected = False
+
+            # Выводим кадр на экран
+            cv2.imshow("Motion Detection", _frame)
+
+        # Если видеопоток закончен, то выходим из цикла
+        else:
+            break
+        # Если была нажата клавиша Esc, то выходим из цикла
+        key = cv2.waitKey(1)
+        if key == 27:
+            break
+
+    # Закрываем окно
+    video.release()
+    cv2.destroyAllWindows()
+
+
+# Графический интерфейс
+def user_ui():
+    file_to_read = None
+    area = None
+
+    window = Tk()
+    window.resizable(False, False)
+    window.title("Детектор движений")
+    window.geometry('1280x720')
+    window.grid_rowconfigure(index=0, weight=1000)
+    window.grid_rowconfigure(index=1, weight=1)
+    window.grid_columnconfigure(index=0, weight=2)
+    window.grid_columnconfigure(index=1, weight=2)
+    window.grid_columnconfigure(index=2, weight=2)
+    window.grid_columnconfigure(index=3, weight=2)
+    label_image = Label()
+    label_image.grid(row=0, column=0, columnspan=4)
+
+    # Функция вывода первого кадра видео
+    def get_background_resize():
+        nonlocal file_to_read
+        video = cv2.VideoCapture(file_to_read)
+        background = Image.fromarray(video.read()[1])
+        fixed_height = 500
+        height_percent = (fixed_height / float(background.size[1]))
+        width_size = int((float(background.size[0]) * float(height_percent)))
+        new_background = background.resize((width_size, fixed_height))
+        tk_background = ImageTk.PhotoImage(new_background)
+        return tk_background
+
+    # Выбор области кадра для распознавания
+    def get_area():
+        nonlocal area, file_to_read
+        if file_to_read is not None:
+            video = cv2.VideoCapture(file_to_read)
+            _background = video.read()[1]
+            area = cv2.selectROI('Select area', _background)
+            cv2.destroyWindow('Select area')
+
+    # Функция удаления области
+    def delete_area():
+        nonlocal area
+        area = None
+
+    # Функция открытия файла
+    def open_file():
+        nonlocal file_to_read
+        nonlocal label_image
+        _file_to_read = filedialog.askopenfilename()
+        if _file_to_read != "":
+            print(_file_to_read)
+            file_to_read = _file_to_read
+            resize_background = get_background_resize()
+            label_image.configure(image=resize_background)
+            label_image.image = resize_background
+
+    # Функция запуска изображения
+    def run():
+        nonlocal area, file_to_read
+        motion_detection(file_to_read, area)
+
+    open_button = Button(text="Открыть файл", command=open_file)
+    open_button.grid(column=0, row=1, sticky=NSEW, padx=10)
+    area_button = Button(text="Выбрать область", command=get_area)
+    area_button.grid(column=1, row=1, sticky=NSEW, padx=10)
+    area_delete_button = Button(text="Удалить область", command=delete_area)
+    area_delete_button.grid(column=2, row=1, sticky=NSEW, padx=10)
+    run_button = Button(text="Воспроизвести", command=run)
+    run_button.grid(column=3, row=1, sticky=NSEW, padx=10)
+    window.mainloop()
+
+
+if __name__ == '__main__':
+    user_ui()
