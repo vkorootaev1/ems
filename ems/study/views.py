@@ -333,7 +333,7 @@ class TrimesterViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
 
         if not self.request.user.is_staff:
             now = datetime.now().date()
-            queryset = queryset.filter(date_start__lt=now)
+            queryset = queryset.filter(date_start__lte=now)
 
         return queryset
 
