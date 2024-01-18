@@ -6,9 +6,9 @@ from study import models as study_models
 
 
 class AdvertisementFileSerializer(serializers.ModelSerializer):
-    
+
     """ Сериализатор файла объявления """
-    
+
     origin_name = serializers.ReadOnlyField()
 
     class Meta:
@@ -17,9 +17,9 @@ class AdvertisementFileSerializer(serializers.ModelSerializer):
 
 
 class AdvertisementSerializer(serializers.ModelSerializer):
-    
+
     """ Сериализатор объявления """
-    
+
     user = users_serializers.NestedUserFIOSerializer(read_only=True)
     groups = study_serializers.NestedStudyGroupSerializer(
         read_only=True, many=True)
@@ -61,3 +61,22 @@ class AdvertisementSerializer(serializers.ModelSerializer):
                     user=user, advertisement=advertisement, file=file)
 
         return advertisement
+
+    def update(self, instance, validated_data):
+        user = self.context.get('user')
+        groups = validated_data.pop('groups')
+        files = validated_data.pop('files_upload', None)
+        body = validated_data.pop('body')
+
+        instance.body = body
+
+        instance.groups.clear()
+        for group in groups:
+            instance.groups.add(group)
+
+        if files:
+            for file in files:
+                models.AdvertisementFile.objects.create(
+                    user=user, advertisement=instance, file=file)
+
+        return instance

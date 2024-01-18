@@ -145,3 +145,12 @@ class StudyGroupCourseListSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CourseTeacherStudyGroup
         fields = ['id', 'study_group',  'trimester', 'study_plan_course']
+
+
+class StudyGroupSerializer(serializers.ModelSerializer):
+
+    """ Сериализатор учебной группы """
+
+    class Meta:
+        model = models.StudyGroup
+        fields = '__all__'

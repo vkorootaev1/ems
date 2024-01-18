@@ -10,3 +10,4 @@ router.register(r'score/result', views.CourseScoreViewSet,
                 basename='resultscore')
 router.register(r'attendance', views.AttendanceViewSet, basename='attendance')
 router.register(r'trimester', views.TrimesterViewSet, basename='trimester')
+router.register(r'studygroup', views.StudyGroupViewSet, basename='studygroup')

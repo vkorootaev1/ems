@@ -2,9 +2,9 @@ from django.db import models
 
 
 class CertificateType(models.Model):
-    
+
     """ Модель типа справки """
-    
+
     name = models.CharField(max_length=150)
     description = models.TextField()
     is_active = models.BooleanField(default=True)
@@ -14,13 +14,13 @@ class CertificateType(models.Model):
 
 
 class Certificate(models.Model):
-    
+
     """ Модель справки """
-    
+
     STATUS_OF_CERTIFICATE = [
         ('cr', 'Создана'),
         ('pr', 'В обработке'),
-        ('re', 'Готова'),
+        ('re', 'Готова к выдаче'),
         ('is', 'Выдана'),
         ('ca', 'Отменена')
     ]

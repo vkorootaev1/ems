@@ -4,7 +4,7 @@ from certificate import models
 
 
 class CertificateTypeSerializer(serializers.ModelSerializer):
-    
+
     """ Сериализатор типа справки """
 
     class Meta:
@@ -13,9 +13,9 @@ class CertificateTypeSerializer(serializers.ModelSerializer):
 
 
 class CertificateSerializer(serializers.ModelSerializer):
-    
+
     """ Сериализатор справки """
-    
+
     type = serializers.SlugRelatedField(slug_field='name', read_only=True)
     type_id = serializers.PrimaryKeyRelatedField(
         source='type', queryset=models.CertificateType.objects.all(), write_only=True)
@@ -33,13 +33,14 @@ class CertificateSerializer(serializers.ModelSerializer):
 
     def validate_status_write(self, value):
         instance = getattr(self, 'instance', None)
-        is_certificate_worker = self.context.get(
-            'user').get_certificate_worker()
-        if not is_certificate_worker:
-            if instance.status == 'ca':
-                raise serializers.ValidationError('Certificate already cancel')
-            if value not in ['cr', 'ca']:
-                raise serializers.ValidationError('status only: <cr> or <ca>')
+        if instance:
+            is_certificate_worker = self.context.get(
+                'user').get_certificate_worker()
+            if not is_certificate_worker:
+                if instance.status == 'ca':
+                    raise serializers.ValidationError('Certificate already cancel')
+                if value not in ['ca']:
+                    raise serializers.ValidationError('status only: <cr> or <ca>')
         return value
 
     def validate_count(self, value):
@@ -49,7 +50,8 @@ class CertificateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context.get('user')
-        return models.Certificate.objects.create(user=user, **validated_data)
+        del validated_data['status']
+        return models.Certificate.objects.create(user=user, status='cr', **validated_data)
 
     def update(self, instance, validated_data):
         user = self.context.get('user')

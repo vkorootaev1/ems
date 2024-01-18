@@ -9,7 +9,6 @@ from ads import models as ads_models
 def delete_file_advertisemet(sender, instance, **kwargs):
     """ Сигнал настроенный на удаление файлов (объявлений) с жесткого диска """
     file_path = instance.file.path
-    print('123')
 
     if os.path.isfile(file_path):
         os.remove(file_path)

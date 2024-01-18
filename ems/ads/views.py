@@ -45,7 +45,7 @@ class AdvertisementViewSet(_mixins.StudentMixin,
         elif self.action == 'create':
             self.permission_classes = [
                 _permissions.IsTeacher | permissions.IsAdminUser]
-        elif self.action in ['update', 'partial_update', 'destroy']:
+        elif self.action in ['update', 'destroy', 'retrieve']:
             self.permission_classes = [
                 _permissions.IsOwner, permissions.IsAuthenticated, ]
         else:

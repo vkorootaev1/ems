@@ -1,12 +1,16 @@
+from time import sleep
 from rest_framework import viewsets, permissions
 from certificate import models
 from certificate.serializers import serializers
 import permissions.permissions as _permissions
+import pagination
 
 
 class CertificateViewSet(viewsets.ModelViewSet):
 
     """ Контроллер справок """
+
+    pagination_class = pagination.SmallPagination
 
     def get_queryset(self):
         user = self.request.user
@@ -41,6 +45,7 @@ class CertificateTypeViewSet(viewsets.ModelViewSet):
     """ Контроллер видов справок """
 
     def get_queryset(self):
+        sleep(0.3)
         return models.CertificateType.objects.all().\
             order_by('name')
 

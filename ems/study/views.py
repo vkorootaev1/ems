@@ -15,6 +15,7 @@ from users import models as users_models
 
 class TimeTableViewSet(_mixins.StudentMixin,
                        _mixins.TeacherMixin,
+                       _mixins.ByTeacherMixin,
                        viewsets.ModelViewSet):
 
     """ Контроллер Расписания """
@@ -24,11 +25,15 @@ class TimeTableViewSet(_mixins.StudentMixin,
     def get_queryset(self):
         student = self.get_student()
         teacher = self.get_teacher()
+        by_teacher = self.get_by_teacher()
 
         queryset = models.TimeTable.objects.\
             select_related('teacher__user', 'course', 'classroom').\
             prefetch_related('groups').\
             order_by('date', 'index_pair')
+
+        if by_teacher:
+            return queryset.filter(teacher=by_teacher)
 
         if student:
             return queryset.filter(groups__student_studygroup=student)
@@ -385,3 +390,24 @@ class StudyGroupCourseListAPIView(_mixins.TeacherMixin,
 
     def get_serializer_class(self):
         return serializers.StudyGroupCourseListSerializer
+
+
+class StudyGroupViewSet(viewsets.ModelViewSet):
+
+    """ Контроллер учебной группы """
+
+    filterset_class = filters.StudyGroupFilter
+
+    def get_queryset(self):
+        return models.StudyGroup.objects.all()
+
+    def get_serializer_class(self):
+        return serializers.StudyGroupSerializer
+
+    def get_permissions(self):
+        if self.action in ['retrieve', 'list']:
+            self.permission_classes = [
+                permissions.IsAuthenticated, ]
+        else:
+            self.permission_classes = [permissions.IsAdminUser, ]
+        return super(self.__class__, self).get_permissions()

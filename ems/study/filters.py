@@ -55,3 +55,10 @@ class StudyGroupCourseListFilter(django_filters.FilterSet):
             trimester_id = study_models.Trimester.objects.get_current_trimester().id
 
         return queryset.filter(trimester_id=trimester_id)
+
+
+class StudyGroupFilter(django_filters.FilterSet):
+
+    """ Фильтр учебных групп """
+
+    name = django_filters.CharFilter(lookup_expr='icontains')

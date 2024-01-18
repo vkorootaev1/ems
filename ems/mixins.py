@@ -22,6 +22,16 @@ class TeacherMixin:
         return self.request.user.get_teacher()
 
 
+class ByTeacherMixin:
+
+    def get_by_teacher(self):
+        teacher_id = self.request.query_params.get('teacher_id', None)
+        try:
+            return users_models.Teacher.objects.get(pk=teacher_id)
+        except:
+            return None
+
+
 class StudyGroupMixin:
 
     def get_study_group(self):
