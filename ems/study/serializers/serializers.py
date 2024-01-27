@@ -102,7 +102,8 @@ class AttendanceSerializer(serializers.ModelSerializer):
     """ Сериализатор посещаемости """
 
     pair = nested_serializers.NestedTimeTableSerializer(read_only=True)
-    student = users_serializers.NestedStudentSerializer(read_only=True)
+    student = users_serializers.NestedStudentWithGroupSerializer(
+        read_only=True)
     teacher = users_serializers.NestedTeacherSerializer(read_only=True)
 
     class Meta:

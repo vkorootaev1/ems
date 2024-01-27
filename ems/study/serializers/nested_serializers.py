@@ -54,7 +54,9 @@ class NestedTimeTableSerializer(serializers.ModelSerializer):
     """ Вложенный сериализатор расписания """
 
     course = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    type_of_pair = serializers.CharField(
+        source='get_type_of_pair_display', read_only=True)
 
     class Meta:
         model = models.TimeTable
-        fields = ['id', 'date', 'course']
+        fields = ['id', 'date', 'course', 'type_of_pair']

@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Sum, F, Q, Count
 from users import models as users_models
+import pagination
 
 
 class TimeTableViewSet(_mixins.StudentMixin,
@@ -21,6 +22,7 @@ class TimeTableViewSet(_mixins.StudentMixin,
     """ Контроллер Расписания """
 
     filterset_class = filters.TimeTableFilter
+    pagination_class = pagination.SmallPagination
 
     def get_queryset(self):
         student = self.get_student()
@@ -53,6 +55,8 @@ class TimeTableViewSet(_mixins.StudentMixin,
         if self.action == 'list':
             self.permission_classes = [
                 _permissions.IsStudent | _permissions.IsTeacher | permissions.IsAdminUser]
+        elif self.action == 'retrieve':
+            self.permission_classes = [_permissions.IsTeacher, ]
         else:
             self.permission_classes = [permissions.IsAdminUser, ]
         return super(self.__class__, self).get_permissions()
@@ -260,18 +264,21 @@ class AttendanceViewSet(_mixins.StudentMixin,
 
     """ Контроллер посещаемости """
 
+    filterset_class = filters.AttendanceFilter
     multiple_update_model = models.Attendance
+    pagination_class = pagination.SmallPagination
 
     def get_queryset(self):
         student = self.get_student()
         teacher = self.get_teacher()
         pair = self.get_pair()
 
-        if not (pair or student or self.request.user.is_staff):
+        if not ((pair and pair.teacher == teacher) or student):
             return models.Attendance.objects.none()
 
         queryset = models.Attendance.objects.all().\
-            select_related('pair', 'student__user', 'teacher__user')
+            select_related('pair__course', 'student__user', 'teacher__user').\
+            order_by('-date_upd')
 
         if student:
             return queryset.filter(student=student, status=False).\
@@ -279,13 +286,13 @@ class AttendanceViewSet(_mixins.StudentMixin,
 
         if teacher:
             if not pair.is_attendance:
-                self.create_attendance_list(pair)
+                self.create_attendance_list(pair, teacher)
             return queryset.filter(pair=pair).\
                 order_by('student__user__last_name')
 
         return queryset
 
-    def create_attendance_list(self, pair):
+    def create_attendance_list(self, pair, teacher):
         students = users_models.Student.objects.\
             filter(study_group__timetable_group=pair).\
             prefetch_related('study_group__timetable_group')
@@ -294,7 +301,7 @@ class AttendanceViewSet(_mixins.StudentMixin,
             models.Attendance.objects.create(
                 student=student,
                 pair=pair,
-                teacher=self.request.user.get_teacher()
+                teacher=teacher
             )
 
         pair.is_attendance = True
@@ -349,7 +356,7 @@ class TrimesterViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
     def get_current_trimester(self, request):
         current_trimester = models.Trimester.objects.get_current_trimester()
         if not current_trimester:
-            return Response({'error': 'current trimester not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'current trimester not found'}, status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(current_trimester)
         return Response(serializer.data)
 
@@ -360,13 +367,28 @@ class TrimesterViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
             current_student_trimester = models.Trimester.objects.get_current_student_trimester(
                 student)
             return Response({'current_student_trimester': current_student_trimester})
-        return Response({'error': 'current student trimester not found'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'current student trimester not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, url_path='student/passed')
+    def get_passed_student_trimester(self, request):
+        student = self.get_student()
+        if student:
+            study_group = models.StudyGroup.objects.get(
+                pk=student.study_group.id)
+            trimesters = models.Trimester.objects.filter(
+                Q(date_start__gte=study_group.begin_date) &
+                Q(date_start__lte=datetime.now().date())
+                & Q(date_end__lte=study_group.end_date)).\
+                order_by('-date_start')
+            serializer = self.get_serializer(trimesters, many=True)
+            return Response(serializer.data)
+        return Response({'error': 'passed student trimesters not found'}, status=status.HTTP_404_NOT_FOUND)
 
     def get_permissions(self):
         if self.action in ['retrieve', 'list', 'get_current_trimester']:
             self.permission_classes = [
                 permissions.IsAuthenticated, ]
-        elif self.action == 'get_current_student_trimester':
+        elif self.action in ['get_current_student_trimester', 'get_passed_student_trimester']:
             self.permission_classes = [_permissions.IsStudent, ]
         else:
             self.permission_classes = [permissions.IsAdminUser, ]
@@ -380,6 +402,7 @@ class StudyGroupCourseListAPIView(_mixins.TeacherMixin,
 
     permission_classes = [_permissions.IsTeacher, ]
     filterset_class = filters.StudyGroupCourseListFilter
+    pagination_class = pagination.SmallPagination
 
     def get_queryset(self):
         teacher = self.get_teacher()

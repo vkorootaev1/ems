@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class TrimesterManager(Manager):
-    
+
     """ Менеджер модели <Триместр> """
 
     def get_current_trimester(self):
@@ -20,3 +20,9 @@ class TrimesterManager(Manager):
             filter(date_start__range=(
                 student.study_group.begin_date, now)).count()
         return current_trimester
+
+    def get_trimester_by_id(self, trimester_id):
+        try:
+            return models.Trimester.objects.get(pk=trimester_id)
+        except:
+            return None

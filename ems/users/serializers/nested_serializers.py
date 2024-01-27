@@ -4,9 +4,9 @@ from study.serializers import nested_serializers as study_nested_serializers
 
 
 class NestedContactSerializer(serializers.ModelSerializer):
-    
+
     """ Вложенный сериализатор контакта пользователя """
-    
+
     type = serializers.SlugRelatedField(slug_field='type', read_only=True)
 
     class Meta:
@@ -15,7 +15,7 @@ class NestedContactSerializer(serializers.ModelSerializer):
 
 
 class NestedUserFIOSerializer(serializers.ModelSerializer):
-    
+
     """ Вложееный сериализатор ФИО пользователя """
 
     class Meta:
@@ -24,7 +24,7 @@ class NestedUserFIOSerializer(serializers.ModelSerializer):
 
 
 class NestedUserFIOWithEmailSerializer(serializers.ModelSerializer):
-    
+
     """ Вложенный сериализатор ФИО и email пользователя """
 
     class Meta:
@@ -33,7 +33,7 @@ class NestedUserFIOWithEmailSerializer(serializers.ModelSerializer):
 
 
 class NestedUserWithPhotoSerializer(serializers.ModelSerializer):
-    
+
     """ Вложенный сериализатор ФИО польльзователя с фото """
 
     class Meta:
@@ -42,9 +42,9 @@ class NestedUserWithPhotoSerializer(serializers.ModelSerializer):
 
 
 class NestedUserWithPhotoContactsSerializer(serializers.ModelSerializer):
-    
+
     """ Вложенный сериализатор ФИО, фото и контактов пользователя """
-    
+
     contacts = NestedContactSerializer(
         source='contact_user', many=True, read_only=True)
 
@@ -54,9 +54,9 @@ class NestedUserWithPhotoContactsSerializer(serializers.ModelSerializer):
 
 
 class NestedStudentWithGroupEmailSerializer(serializers.ModelSerializer):
-    
+
     """ Вложенный сериализатор ФИО студента, email и группы """
-    
+
     user = NestedUserFIOWithEmailSerializer(read_only=True)
     study_group = study_nested_serializers.NestedStudyGroupSerializer(
         read_only=True)
@@ -67,10 +67,23 @@ class NestedStudentWithGroupEmailSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'study_group', 'role']
 
 
+class NestedStudentWithGroupSerializer(serializers.ModelSerializer):
+
+    """ Вложенный сериализатор ФИО студента и его группы  """
+
+    user = NestedUserFIOSerializer(read_only=True)
+    study_group = study_nested_serializers.NestedStudyGroupSerializer(
+        read_only=True)
+
+    class Meta:
+        model = models.Student
+        fields = ['id', 'user', 'study_group']
+
+
 class NestedStudentSerializer(serializers.ModelSerializer):
-    
+
     """ Вложенный сериализатор ФИО студента """
-    
+
     user = NestedUserFIOSerializer(read_only=True)
 
     class Meta:
@@ -79,9 +92,9 @@ class NestedStudentSerializer(serializers.ModelSerializer):
 
 
 class NestedTeacherWithEmailSerializer(serializers.ModelSerializer):
-    
+
     """ Вложенный сериализатор ФИО преподавателя и email """
-    
+
     user = NestedUserFIOWithEmailSerializer(read_only=True)
     role = serializers.ReadOnlyField(default='teacher')
 
@@ -91,9 +104,9 @@ class NestedTeacherWithEmailSerializer(serializers.ModelSerializer):
 
 
 class NestedTeacherSerializer(serializers.ModelSerializer):
-    
+
     """ Вложенный сериализатор ФИО преподавателя """
-    
+
     user = NestedUserFIOSerializer(read_only=True)
 
     class Meta:
@@ -102,9 +115,9 @@ class NestedTeacherSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    
+
     """ Вложенный сериализатор деталей о пользователе """
-    
+
     students = NestedStudentWithGroupEmailSerializer(
         read_only=True, many=True, source='student_user')
     teacher = NestedTeacherWithEmailSerializer(source='teacher_user',
