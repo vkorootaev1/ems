@@ -3,6 +3,7 @@ from rest_framework import permissions, generics
 from auth import serializers
 from knox.models import AuthToken
 from users.serializers import nested_serializers as users_serializers
+from throttles import LoginThrottle
 
 
 class LoginView(generics.GenericAPIView):
@@ -11,6 +12,7 @@ class LoginView(generics.GenericAPIView):
 
     permission_classes = [permissions.AllowAny, ]
     serializer_class = serializers.LoginSerializer
+    throttle_classes = [LoginThrottle, ]
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)

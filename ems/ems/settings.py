@@ -57,12 +57,13 @@ INSTALLED_APPS = [
     'study',
     'certificate',
     'ads',
+    'external_app_configs.AuditLogConfig',
     'rest_framework',
     'silk',
     'django_filters',
-    'knox',
+    'external_app_configs.KnoxConfig',
     'djoser',
-    "corsheaders",
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middlewares.AuditlogMiddleware',
     'silk.middleware.SilkyMiddleware',
 ]
 
@@ -230,3 +232,75 @@ DEFAULT_FROM_EMAIL = 'ivankorotaev00@yandex.ru'
 # Django
 
 PASSWORD_RESET_TIMEOUT = 60 * 3
+
+# Django Audit Log
+
+AUDITLOG_INCLUDE_TRACKING_MODELS = (
+    {
+        "model": "study.Course",
+        "m2m_fields": ["owners"],
+        "serialize_data": True,
+    },
+    {
+        "model": "study.ControlMeasure",
+        "serialize_data": True,
+    },
+    {
+        "model": "study.StudyPlan",
+        "serialize_data": True,
+    },
+    {
+        "model": "study.StudyPlanCourses",
+        "serialize_data": True,
+    },
+    {
+        "model": "study.StudyGroup",
+        "serialize_data": True,
+    },
+    {
+        "model": "study.Attendance",
+        "serialize_data": True,
+    },
+    {
+        "model": "study.ControlMeasureScore",
+        "serialize_data": True,
+    },
+    {
+        "model": "study.CourseScore",
+        "serialize_data": True,
+    },
+    {
+        "model": "study.CourseTeacherStudyGroup",
+        "serialize_data": True,
+    },
+    {
+        "model": "users.User",
+        "exclude_fields": ["last_login"],
+        "serialize_data": True,
+    },
+    {
+        "model": "users.UserInfo",
+        "mask_fields": ["passport_series_and_number", "date_of_issue_of_the_passport",
+                        "the_authority_that_issued_the_passport", "the_authority_that_issued_the_passport",
+                        "place_of_registration", "place_of_living", "inn", "snils"],
+        "serialize_data": True,
+    },
+    {
+        "model": "users.Student",
+        "serialize_data": True,
+    },
+    {
+        "model": "users.Teacher",
+        "m2m_fields": ["cathedra", "courses"],
+        "serialize_data": True,
+    },
+    {
+        "model": "users.PersonRole",
+        "serialize_data": True,
+    },
+    {
+        "model": "users.Person",
+        "m2m_fields": ["roles"],
+        "serialize_data": True,
+    },
+)

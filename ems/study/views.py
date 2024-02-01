@@ -277,7 +277,7 @@ class AttendanceViewSet(_mixins.StudentMixin,
             return models.Attendance.objects.none()
 
         queryset = models.Attendance.objects.all().\
-            select_related('pair__course', 'student__user', 'teacher__user').\
+            select_related('pair__course', 'student__user', 'teacher__user', 'student__study_group').\
             order_by('-date_upd')
 
         if student:
