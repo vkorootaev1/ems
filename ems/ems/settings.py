@@ -28,13 +28,13 @@ SECRET_KEY = 'django-insecure--i%1@51_q#^yvui9c5hnnw6^mb541+$8%wobc36e$+rdvayq0_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.0.101']
+ALLOWED_HOSTS = ['192.168.0.5']
 
 # CORS
 
 CORS_ALLOWED_ORIGINS = [
     "http://192.168.0.101:8080",
-    "http://192.168.0.5:8081",
+    "http://192.168.0.5:8080",
 ]
 
 CORS_ALLOW_HEADERS = ['content-disposition', 'accept-encoding',
@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'external_app_configs.KnoxConfig',
     'djoser',
     'corsheaders',
+    'authaudit',
 ]
 
 MIDDLEWARE = [
@@ -75,6 +76,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middlewares.AuthAuditMiddleware',
     'middlewares.AuditlogMiddleware',
     'silk.middleware.SilkyMiddleware',
 ]
@@ -108,7 +110,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'ems',
         'USER': 'postgres',
-        'PASSWORD': '2110',
+        'PASSWORD': 'qweasd',
         'HOST': 'localhost',
         'PORT': '',
     }

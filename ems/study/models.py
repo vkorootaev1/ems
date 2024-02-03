@@ -149,6 +149,7 @@ class Trimester(models.Model):
     class Meta:
         verbose_name = 'Триместр'
         verbose_name_plural = 'Триместры'
+        ordering = ['-date_start', ]
         unique_together = ['date_start', 'date_end']
 
 

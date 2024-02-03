@@ -125,6 +125,28 @@ class AttendanceMultipleUpdateSerializer(serializers.Serializer):
         return instance
 
 
+class CourseScoreOtherMultipleUpdateSerializer(serializers.Serializer):
+
+    """ Сериализатор для массового обновления итоговых оценок (для практик, физ. кульутры и т.д.)"""
+
+    score = serializers.ChoiceField(choices=models.CourseScore.SCORES)
+
+    def validate_score(self, value):
+        instance = self.instance
+        type_of_mark = self.context.get('type_of_mark')
+        if (type_of_mark == 'ex' and value not in ['2', '3', '4', '5', 'NO']) or (type_of_mark == 'za' and value not in ['OK', 'FA', 'NO']):
+            raise serializers.ValidationError(
+                {'error': f'Wrong score: {value}, id:{instance.id}'})
+        return value
+
+    def update(self, instance, validated_data):
+        teacher = self.context.get('teacher')
+        instance.score = validated_data.get('score')
+        instance.teacher = teacher
+        instance.save()
+        return instance
+
+
 class TrimesterSerializer(serializers.ModelSerializer):
 
     """ Сериализатор триместра """

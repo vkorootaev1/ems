@@ -4,6 +4,7 @@ from auth import serializers
 from knox.models import AuthToken
 from users.serializers import nested_serializers as users_serializers
 from throttles import LoginThrottle
+from authaudit.signals import user_logged_in
 
 
 class LoginView(generics.GenericAPIView):
@@ -18,6 +19,7 @@ class LoginView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
+        user_logged_in(sender=user.__class__, request=request, user=user)
         return Response({
             'user_profiles': users_serializers.UserDetailSerializer(user).data,
             'token': AuthToken.objects.create(user)[1]

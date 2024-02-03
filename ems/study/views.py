@@ -1,5 +1,4 @@
 from datetime import datetime
-from time import sleep
 from rest_framework import viewsets, permissions, generics
 from study import models
 from study.serializers import serializers
@@ -12,6 +11,7 @@ from rest_framework import status
 from django.db.models import Sum, F, Q, Count
 from users import models as users_models
 import pagination
+from rest_framework import status
 
 
 class TimeTableViewSet(_mixins.StudentMixin,
@@ -166,9 +166,12 @@ class CourseScoreViewSet(_mixins.StudentMixin,
                          _mixins.TeacherMixin,
                          _mixins.StudyPlanCourseMixin,
                          _mixins.StudyGroupMixin,
+                         _mixins.MultipleUpdateMixin,
                          viewsets.ModelViewSet):
 
     """ Контроллер итоговых оценок """
+
+    multiple_update_model = models.CourseScore
 
     def get_queryset(self):
         student = self.get_student()
@@ -221,10 +224,11 @@ class CourseScoreViewSet(_mixins.StudentMixin,
         return 'OK'
 
     @action(detail=False, methods=['put'])
-    def set_scores(self, request):
+    def set_scores_discipline(self, request):
         studyplancourse = self.get_studyplan_course()
         study_group = self.get_study_group()
         course = models.Course.objects.get(pk=studyplancourse.course.id)
+        teacher = self.get_teacher()
 
         course_scores = models.CourseScore.objects.\
             filter(student__study_group=study_group,
@@ -234,21 +238,41 @@ class CourseScoreViewSet(_mixins.StudentMixin,
         for course_score in course_scores:
             course_score.score = self.calculate_course_score(
                 course_score.student_id, course)
-            course_score.teacher = self.get_teacher()
+            course_score.teacher = teacher
             course_score.save()
 
         serializer = self.get_serializer(course_scores, many=True)
 
         return Response(serializer.data)
 
+    @action(detail=False, methods=['put'])
+    def set_scores_other(self, request):
+        studyplancourse = self.get_studyplan_course()
+        if studyplancourse.course.type_of_course == 'DISCIPLINE':
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        study_group = self.get_study_group()
+        filter_kwargs = {'student__study_group': study_group,
+                         'course': studyplancourse}
+        return super().multiple_update(request, **filter_kwargs)
+
     def get_serializer_class(self):
+        if self.action == 'set_scores_other':
+            return serializers.CourseScoreOtherMultipleUpdateSerializer
         return serializers.CourseScoreSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if self.action == 'set_scores_other':
+            context['teacher'] = self.get_teacher()
+            context['type_of_mark'] = self.get_studyplan_course(
+            ).course.type_of_mark
+        return context
 
     def get_permissions(self):
         if self.action == 'list':
             self.permission_classes = [
                 _permissions.IsStudent | _permissions.IsTeacher | permissions.IsAdminUser]
-        elif self.action == 'set_scores':
+        elif self.action in ['set_scores_discipline', 'set_scores_other']:
             self.permission_classes = [
                 _permissions.IsTeacherAndHasEdit]
         else:
