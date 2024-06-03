@@ -4,5 +4,7 @@
         "editor.formatOnSave": true
     },
     "editor.showFoldingControls": "always",
-    "python.terminal.activateEnvironment": true
+    "python.terminal.activateEnvironment": true,
+    "workbench.colorTheme": "Default Light+",
+    "editor.renderWhitespace": "none",
 }

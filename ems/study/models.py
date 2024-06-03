@@ -177,31 +177,42 @@ class TimeTable(models.Model):
 
     """ Модель расписания """
 
+    # Типы пар
     TYPE_OF_PAIR = [
         ('LE', 'Лекция'),
         ('PR', 'Практика'),
         ('LA', 'Лабораторная работа')
     ]
-
+    # Дата пары
     date = models.DateField(verbose_name='Дата пары')
+    # Учебные группы, у которых проводится пара
     groups = models.ManyToManyField('StudyGroup',
                                     related_name='timetable_group', verbose_name='Группы')
+    # Тип пары
     type_of_pair = models.CharField(
         max_length=2, choices=TYPE_OF_PAIR, verbose_name='Тип пары')
+    # Порядок пары (1, 2, 3, ...)
     index_pair = models.PositiveSmallIntegerField(verbose_name='Номер пары')
+    # Дисциплина, которая проводится на паре
     course = models.ForeignKey('Course', on_delete=models.PROTECT,
                                related_name='timetable_course', verbose_name='Курс')
+    # Преподаватель, который ведет пару
     teacher = models.ForeignKey('users.Teacher', on_delete=models.PROTECT,
                                 related_name='timetable_teacher', verbose_name='Преподаватель')
+    # Аудитория, в которой проводится пара
     classroom = models.ForeignKey('university.Classroom', on_delete=models.PROTECT,
                                   related_name='timetable_classroom', verbose_name='Аудитория')
+    # Дата создания записи о паре
     date_add = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата добавления')
+    # Дата последнего изменения информации о паре
     date_upd = models.DateTimeField(
         auto_now=True, verbose_name='Дата обновления')
+    # Выставлена ли посещаемость студентам за текущую пару
     is_attendance = models.BooleanField(
         default=None, blank=True, verbose_name='Посещаемость')
 
+    # Мета информация о модели
     class Meta:
         verbose_name = 'Пара'
         verbose_name_plural = 'Расписание'

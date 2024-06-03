@@ -363,7 +363,10 @@ class AttendanceViewSet(_mixins.StudentMixin,
 class TrimesterViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
 
     """ Контроллер триместра """
+    """ Код пос созданию, изменению, удалению записи о триместре 
+        создается автоматически самим Django REST Framework и может быть переписан"""
 
+    # Получение всех записей о триместрах из БД
     def get_queryset(self):
         queryset = models.Trimester.objects.all().order_by('-date_start')
 
@@ -373,9 +376,11 @@ class TrimesterViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
 
         return queryset
 
+    # Получение сериализатора
     def get_serializer_class(self):
         return serializers.TrimesterSerializer
 
+    # Получение текущего триместра
     @action(detail=False, url_path='current')
     def get_current_trimester(self, request):
         current_trimester = models.Trimester.objects.get_current_trimester()
@@ -384,6 +389,7 @@ class TrimesterViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(current_trimester)
         return Response(serializer.data)
 
+    # Получение текущего триместра студента (на каком курсе и каком триместре он обучается в данный момент времени)
     @action(detail=False, url_path='student')
     def get_current_student_trimester(self, request):
         student = self.get_student()
@@ -393,6 +399,7 @@ class TrimesterViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
             return Response({'current_student_trimester': current_student_trimester})
         return Response({'error': 'current student trimester not found'}, status=status.HTTP_404_NOT_FOUND)
 
+    # Получение прошедших триместров студента
     @action(detail=False, url_path='student/passed')
     def get_passed_student_trimester(self, request):
         student = self.get_student()
@@ -408,6 +415,7 @@ class TrimesterViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
             return Response(serializer.data)
         return Response({'error': 'passed student trimesters not found'}, status=status.HTTP_404_NOT_FOUND)
 
+    # Проверка прав доступа
     def get_permissions(self):
         if self.action in ['retrieve', 'list', 'get_current_trimester']:
             self.permission_classes = [

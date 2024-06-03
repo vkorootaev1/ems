@@ -8,22 +8,34 @@ class TimeTableFilter(django_filters.FilterSet):
 
     """ Фильтр расписания """
 
+    # Отбор расписания по году
     year = django_filters.NumberFilter(field_name='date', lookup_expr='year')
+    # Отбор расписания по недели
     week = django_filters.NumberFilter(field_name='date', lookup_expr='week')
+    # Отбор расписания по посещаемости (выставлена ли посещаемость за пару)
     attendance = django_filters.BooleanFilter(field_name='is_attendance')
+    # Отбор расписания по дисциплинам
     course_name = django_filters.CharFilter(method='get_by_course_name')
+    # Отбор расписания по учебной группе
     group_name = django_filters.CharFilter(method='get_by_group_name')
+    # Отбор расписания по триместру
     trimester = django_filters.NumberFilter(method='get_by_trimester')
+    # Сортировка расписания по дате
     order = django_filters.OrderingFilter(fields=(
         ('date', 'date'),
     ))
 
+    # Функция отбора расписания по дисциплине
     def get_by_course_name(self, queryset, name, value):
-        return queryset.filter(course__name__icontains=value, date__lte=datetime.now().date()).order_by('-date', '-index_pair')
+        return queryset.filter(course__name__icontains=value, date__lte=datetime.now().date()).\
+            order_by('-date', '-index_pair')
 
+    # Функция отбора расписания по учебной группе
     def get_by_group_name(self, queryset, name, value):
-        return queryset.filter(groups__name__icontains=value, date__lte=datetime.now().date()).order_by('-date', '-groups__name')
+        return queryset.filter(groups__name__icontains=value, date__lte=datetime.now().date()).\
+            order_by('-date', '-groups__name')
 
+    # Функция отбора расписания по триместру
     def get_by_trimester(self, queryset, name, value):
         if value == 0:
             trimester = study_models.Trimester.objects.get_current_trimester()
@@ -38,6 +50,7 @@ class TimeTableFilter(django_filters.FilterSet):
 
         return study_models.TimeTable.objects.none()
 
+    # Мета информация
     class Meta:
         model = study_models.TimeTable
         fields = ['date', 'is_attendance', 'course__name']

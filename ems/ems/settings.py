@@ -28,13 +28,12 @@ SECRET_KEY = 'django-insecure--i%1@51_q#^yvui9c5hnnw6^mb541+$8%wobc36e$+rdvayq0_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.0.5']
+ALLOWED_HOSTS = ['192.168.0.111']
 
 # CORS
 
 CORS_ALLOWED_ORIGINS = [
-    "http://192.168.0.101:8080",
-    "http://192.168.0.5:8080",
+    "http://192.168.0.111:8080",
 ]
 
 CORS_ALLOW_HEADERS = ['content-disposition', 'accept-encoding',
@@ -227,7 +226,7 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 
 EMAIL_HOST_USER = 'ivankorotaev00@yandex.ru'
-EMAIL_HOST_PASSWORD = 'convdufjktwdptbl'
+EMAIL_HOST_PASSWORD = '*'
 EMAIL_PORT = 465
 DEFAULT_FROM_EMAIL = 'ivankorotaev00@yandex.ru'
 

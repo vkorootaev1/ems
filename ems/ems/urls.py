@@ -21,6 +21,9 @@ from django.urls import path, include
 
 BASE_API_V_1 = 'api/v1'
 
+admin.site.site_title = 'Система управления учебным процессом'
+admin.site.site_header = 'Система управления учебным процессом'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(f'{BASE_API_V_1}/', include('university.urls')),

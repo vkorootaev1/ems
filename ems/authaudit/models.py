@@ -26,8 +26,8 @@ class AuthAudit(models.Model):
         auto_now_add=True, verbose_name='Время добавления')
 
     class Meta:
-        verbose_name = 'Аудит аутентификации'
-        verbose_name_plural = 'Аудит аутентификации'
+        verbose_name = 'Запись журнала аутентификации'
+        verbose_name_plural = 'Запись журнала аутентификации'
         ordering = ['-timestamp', ]
 
     def __str__(self) -> str:
