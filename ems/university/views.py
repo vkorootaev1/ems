@@ -4,6 +4,9 @@ from university.serializers import serializers
 
 
 class ClassRoomViewSet(viewsets.ModelViewSet):
+
+    """ Представление учебных аудиторий """
+
     serializer_class = serializers.ClassRoomSerializer
 
     def get_queryset(self):
@@ -20,6 +23,8 @@ class ClassRoomViewSet(viewsets.ModelViewSet):
 
 class FacultyViewSet(viewsets.ModelViewSet):
 
+    """ Представление факультетов """
+
     serializer_class = serializers.ClassRoomSerializer
 
     def get_queryset(self):
@@ -35,6 +40,9 @@ class FacultyViewSet(viewsets.ModelViewSet):
 
 
 class CathedraViewSet(viewsets.ModelViewSet):
+
+    """ Представление кафедр """
+
     serializer_class = serializers.ClassRoomSerializer
 
     def get_queryset(self):
@@ -50,6 +58,9 @@ class CathedraViewSet(viewsets.ModelViewSet):
 
 
 class SpecialityViewSet(viewsets.ModelViewSet):
+
+    """ Представление специальностей """
+
     serializer_class = serializers.ClassRoomSerializer
 
     def get_queryset(self):

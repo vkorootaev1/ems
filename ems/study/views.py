@@ -19,7 +19,7 @@ class TimeTableViewSet(_mixins.StudentMixin,
                        _mixins.ByTeacherMixin,
                        viewsets.ModelViewSet):
 
-    """ Контроллер Расписания """
+    """ Представление Расписания """
 
     filterset_class = filters.TimeTableFilter
     pagination_class = pagination.SmallPagination
@@ -64,7 +64,7 @@ class TimeTableViewSet(_mixins.StudentMixin,
 
 class StudyPlanViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
 
-    """ Контроллер учебного плана студента """
+    """ Представление учебного плана студента """
 
     def get_queryset(self):
         student = self.get_student()
@@ -101,7 +101,7 @@ class ControlMeasureScoreViewSet(_mixins.StudentMixin,
                                  _mixins.MultipleUpdateMixin,
                                  viewsets.ModelViewSet):
 
-    """ Контроллер промежуточных оценок """
+    """ Представление промежуточных оценок """
 
     filterset_class = filters.ControlMeasureScoreFilter
     multiple_update_model = models.ControlMeasureScore
@@ -169,7 +169,7 @@ class CourseScoreViewSet(_mixins.StudentMixin,
                          _mixins.MultipleUpdateMixin,
                          viewsets.ModelViewSet):
 
-    """ Контроллер итоговых оценок """
+    """ Представление итоговых оценок """
 
     multiple_update_model = models.CourseScore
 
@@ -286,7 +286,7 @@ class AttendanceViewSet(_mixins.StudentMixin,
                         _mixins.MultipleUpdateMixin,
                         viewsets.ModelViewSet):
 
-    """ Контроллер посещаемости """
+    """ Представление посещаемости """
 
     filterset_class = filters.AttendanceFilter
     multiple_update_model = models.Attendance
@@ -362,8 +362,8 @@ class AttendanceViewSet(_mixins.StudentMixin,
 
 class TrimesterViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
 
-    """ Контроллер триместра """
-    """ Код пос созданию, изменению, удалению записи о триместре 
+    """ Представление триместра """
+    """ Код по созданию, изменению, удалению записи о триместре 
         создается автоматически самим Django REST Framework и может быть переписан"""
 
     # Получение всех записей о триместрах из БД
@@ -430,7 +430,7 @@ class TrimesterViewSet(_mixins.StudentMixin, viewsets.ModelViewSet):
 class StudyGroupCourseListAPIView(_mixins.TeacherMixin,
                                   generics.ListAPIView):
 
-    """ Контроллер учебной группы и их курсов у преподавателя"""
+    """ Представление учебной группы и их курсов у преподавателя"""
 
     permission_classes = [_permissions.IsTeacher, ]
     filterset_class = filters.StudyGroupCourseListFilter
@@ -449,7 +449,7 @@ class StudyGroupCourseListAPIView(_mixins.TeacherMixin,
 
 class StudyGroupViewSet(viewsets.ModelViewSet):
 
-    """ Контроллер учебной группы """
+    """ Представление учебной группы """
 
     filterset_class = filters.StudyGroupFilter
 

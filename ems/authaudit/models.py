@@ -4,6 +4,8 @@ from ems import settings
 
 class AuthAudit(models.Model):
 
+    "Модель журнала аутентификации"
+
     AUTH_CHOICES = (
         ('LOGIN', 'Вход'),
         ('LOGOUT', 'Выход'),

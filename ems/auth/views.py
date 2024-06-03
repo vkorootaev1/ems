@@ -9,7 +9,7 @@ from authaudit.signals import user_logged_in
 
 class LoginView(generics.GenericAPIView):
 
-    """ Контроллер входа (авторизации) """
+    """ Представление входа (авторизации) """
 
     permission_classes = [permissions.AllowAny, ]
     serializer_class = serializers.LoginSerializer

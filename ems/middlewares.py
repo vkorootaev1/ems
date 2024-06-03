@@ -5,6 +5,7 @@ from django.utils.functional import SimpleLazyObject
 
 
 class AuditlogMiddleware(_AuditlogMiddleware):
+
     def __call__(self, request):
         remote_addr = self._get_remote_addr(request)
 

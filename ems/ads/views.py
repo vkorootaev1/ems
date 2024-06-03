@@ -10,7 +10,7 @@ class AdvertisementViewSet(_mixins.StudentMixin,
                            _mixins.TeacherMixin,
                            viewsets.ModelViewSet):
 
-    """ Контроллер объявлений """
+    """ Представление объявлений """
 
     pagination_class = pagination.SmallPagination
 
@@ -57,7 +57,7 @@ class AdvertisementFileViewSet(viewsets.ModelViewSet):
 
     permission_classes = [_permissions.IsOwner | permissions.IsAdminUser]
 
-    """ Контроллер файлов объявлений """
+    """ Представление файлов объявлений """
 
     def get_queryset(self):
         user = self.request.user

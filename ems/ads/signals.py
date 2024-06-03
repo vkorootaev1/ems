@@ -8,6 +8,7 @@ from ads import models as ads_models
 @receiver(post_delete, sender=ads_models.AdvertisementFile)
 def delete_file_advertisemet(sender, instance, **kwargs):
     """ Сигнал настроенный на удаление файлов (объявлений) с жесткого диска """
+
     file_path = instance.file.path
 
     if os.path.isfile(file_path):

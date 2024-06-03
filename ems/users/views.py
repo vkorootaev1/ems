@@ -14,7 +14,7 @@ class UserViewSet(_mixins.StudentMixin,
                   _mixins.TeacherMixin,
                   viewsets.ModelViewSet):
 
-    """ Контроллер пользователя """
+    """ Представление пользователя """
 
     def get_queryset(self):
         return models.User.objects.all()
@@ -75,7 +75,7 @@ class UserViewSet(_mixins.StudentMixin,
 
 class TeachersViewSet(viewsets.ModelViewSet):
 
-    """ Контроллер преподавателя """
+    """ Представление преподавателя """
 
     pagination_class = pagination.SmallPagination
     filterset_class = filters.TeacherFilter
@@ -109,7 +109,7 @@ class TeachersViewSet(viewsets.ModelViewSet):
 
 class ContactViewSet(viewsets.ModelViewSet):
 
-    """ Контроллер контактов преподавателя и другого персонала """
+    """ Представление контактов преподавателя и другого персонала """
 
     filterset_class = filters.ContactFilter
 
@@ -140,7 +140,7 @@ class ContactViewSet(viewsets.ModelViewSet):
 
 class ContactTypeViewSet(viewsets.ModelViewSet):
 
-    """ Контроллер для типа контактов """
+    """ Представление для типа контактов """
 
     def get_queryset(self):
         return models.ContactType.objects.all()

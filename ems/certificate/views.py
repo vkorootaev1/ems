@@ -8,7 +8,7 @@ import pagination
 
 class CertificateViewSet(viewsets.ModelViewSet):
 
-    """ Контроллер справок """
+    """ Представление справок """
 
     pagination_class = pagination.SmallPagination
 
@@ -42,7 +42,7 @@ class CertificateViewSet(viewsets.ModelViewSet):
 
 class CertificateTypeViewSet(viewsets.ModelViewSet):
 
-    """ Контроллер видов справок """
+    """ Представление вида справок """
 
     def get_queryset(self):
         sleep(0.3)
