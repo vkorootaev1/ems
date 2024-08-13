@@ -23,17 +23,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--i%1@51_q#^yvui9c5hnnw6^mb541+$8%wobc36e$+rdvayq0_'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.3.8']
+ALLOWED_HOSTS = ['']
 
 # CORS
 
 CORS_ALLOWED_ORIGINS = [
-    "http://192.168.3.8:8080",
+    "",
 ]
 
 CORS_ALLOW_HEADERS = ['content-disposition', 'accept-encoding',
@@ -106,11 +106,11 @@ WSGI_APPLICATION = 'ems.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ems',
-        'USER': 'postgres',
-        'PASSWORD': '2110',
-        'HOST': 'localhost',
+        'ENGINE': '',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
         'PORT': '',
     }
 }
@@ -216,7 +216,7 @@ DJOSER = {
 
 # Site
 
-DOMAIN = '192.168.0.5:8080'
+DOMAIN = ''
 SITE_NAME = 'EMS'
 
 # SMTP
